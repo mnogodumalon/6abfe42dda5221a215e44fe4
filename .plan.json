@@ -1,0 +1,292 @@
+{
+  "version": 1,
+  "language": "de",
+  "understanding": {
+    "summary": "Eine Verwaltung für Ihr Yogastudio: Sie pflegen Yogalehrer, Teilnehmer und Kurse, nehmen Anmeldungen entgegen und behalten Zahlungen im Blick. Für jeden Kurs lassen sich außerdem Marketing-Einträge mit Instagram- und TikTok-Link samt Foto ablegen.",
+    "roles": [
+      "Studioleitung",
+      "Kursleiter",
+      "Verwaltung und Empfang",
+      "Marketing"
+    ],
+    "main_tasks": [
+      "Kurse planen und Anmeldung öffnen",
+      "Teilnehmer für einen Kurs anmelden",
+      "Zahlungen und Wartelisten verfolgen",
+      "Marketing-Beiträge zu Kursen mit Instagram- und TikTok-Link und Foto pflegen"
+    ],
+    "platform_roles": [
+      {
+        "persona": "Studioleitung",
+        "role": "administrator",
+        "apps": [
+          "yogalehrer",
+          "teilnehmer",
+          "kurse",
+          "anmeldungen",
+          "marketing"
+        ]
+      },
+      {
+        "persona": "Verwaltung und Empfang",
+        "role": "datenverarbeitung",
+        "apps": [
+          "teilnehmer",
+          "kurse",
+          "anmeldungen"
+        ]
+      },
+      {
+        "persona": "Kursleiter",
+        "role": "standard",
+        "apps": [
+          "kurse",
+          "anmeldungen"
+        ]
+      },
+      {
+        "persona": "Marketing",
+        "role": "datenverarbeitung",
+        "apps": [
+          "marketing",
+          "kurse"
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "slug": "teilnehmer-anmelden",
+      "label": {
+        "de": "Teilnehmer anmelden",
+        "en": "Register participant"
+      },
+      "description": "Einen Teilnehmer für einen Kurs anmelden: Teilnehmer wählen oder neu anlegen, Kurs mit freien Plätzen wählen, Anmeldung speichern.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "teilnehmer",
+          "op": "create",
+          "when": "optional",
+          "fields": {
+            "teilnehmer_firstname": "user",
+            "teilnehmer_lastname": "user",
+            "email": "user",
+            "telefon": "user",
+            "erfahrungslevel": "user",
+            "gesundheitliche_hinweise": "user"
+          },
+          "needs": {}
+        },
+        {
+          "entity": "anmeldungen",
+          "op": "create",
+          "when": "always",
+          "fields": {
+            "teilnehmer": "picked",
+            "kurs": "picked",
+            "anmeldedatum": "derived:today",
+            "anmeldestatus": "fixed:angemeldet",
+            "zahlungsstatus": "fixed:offen",
+            "bemerkung": "user"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `teilnehmer-anmelden` — Teilnehmer anmelden\nEinen Teilnehmer für einen Kurs anmelden: Teilnehmer wählen oder neu anlegen, Kurs mit freien Plätzen wählen, Anmeldung speichern.\n\n## Your hook — import it, never rebuild what it owns\n`import { useTeilnehmerAnmeldenFlow } from '@/lib/journey/flows/TeilnehmerAnmelden';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`. Options: `steps` (field → step), `items` (how a hit reads, per pick: teilnehmer, kurs), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Kurs mit offener Anmeldung auswählen\n2. Bestehenden Teilnehmer wählen oder neuen Teilnehmer erfassen\n3. Anmeldung bestätigen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- creates `teilnehmer` (only when the flow needs it):\n    - `teilnehmer_firstname`: the user enters it (bind it through the layer: form.field/…)\n    - `teilnehmer_lastname`: the user enters it (bind it through the layer: form.field/…)\n    - `email`: the user enters it (bind it through the layer: form.field/…)\n    - `telefon`: the user enters it (bind it through the layer: form.field/…)\n    - `erfahrungslevel`: the user enters it (bind it through the layer: form.field/…)\n    - `gesundheitliche_hinweise`: the user enters it (bind it through the layer: form.field/…)\n- creates `anmeldungen`:\n    - `teilnehmer`: from the record the user picks in this flow\n    - `kurs`: from the record the user picks in this flow\n    - `anmeldedatum`: derived: today() — set it in the plan step, never ask\n    - `anmeldestatus`: fixed value `angemeldet` — set it in the plan step's values, never ask\n    - `zahlungsstatus`: fixed value `offen` — set it in the plan step's values, never ask\n    - `bemerkung`: the user enters it (bind it through the layer: form.field/…)\n\n## Reads\n- `kurse` columns kursname, startdatum, wochentag, max_teilnehmer, preis, status\n- `teilnehmer` columns teilnehmer_firstname, teilnehmer_lastname, email\n\n## Checks BEFORE the write (block the submit with the message when they fail)\n- unique (field=`anmeldungen.teilnehmer`, scope=`anmeldungen.kurs`) — message: „Dieser Teilnehmer ist für den Kurs schon angemeldet.“\n\n## Success page\n- shows: `anmeldungen.teilnehmer`, `anmeldungen.kurs`, `anmeldungen.anmeldestatus`\n- next flows to offer: `zahlung-erfassen`\n\n## Never write these — another flow or a tool owns them\n- `kurse.kursname` (owner: intent `kurs-anlegen`)\n- `kurse.yogastil` (owner: intent `kurs-anlegen`)\n- `kurse.niveau` (owner: intent `kurs-anlegen`)\n- `kurse.kursleiter` (owner: intent `kurs-anlegen`)\n- `kurse.beschreibung` (owner: intent `kurs-anlegen`)\n- `kurse.startdatum` (owner: intent `kurs-anlegen`)\n- `kurse.dauer_minuten` (owner: intent `kurs-anlegen`)\n- `kurse.anzahl_termine` (owner: intent `kurs-anlegen`)\n- `kurse.wochentag` (owner: intent `kurs-anlegen`)\n- `kurse.raum` (owner: intent `kurs-anlegen`)\n- `kurse.max_teilnehmer` (owner: intent `kurs-anlegen`)\n- `kurse.preis` (owner: intent `kurs-anlegen`)\n- `kurse.status` (owner: intent `kurs-anlegen`)\n- `marketing.kurs` (owner: intent `kurs-anlegen`)\n- `marketing.insta_url` (owner: intent `kurs-anlegen`)\n- `marketing.tiktok_url` (owner: intent `kurs-anlegen`)\n"
+    },
+    {
+      "slug": "zahlung-erfassen",
+      "label": {
+        "de": "Zahlung erfassen",
+        "en": "Record payment"
+      },
+      "description": "Zu einer Anmeldung den Zahlungsstatus setzen und die Anmeldung bei Zahlungseingang bestätigen.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "anmeldungen",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "zahlungsstatus": "user",
+            "anmeldestatus": "fixed:bestaetigt"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `zahlung-erfassen` — Zahlung erfassen\nZu einer Anmeldung den Zahlungsstatus setzen und die Anmeldung bei Zahlungseingang bestätigen.\n\n## Your hook — import it, never rebuild what it owns\n`import { useZahlungErfassenFlow } from '@/lib/journey/flows/ZahlungErfassen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `anmeldungen`: `{...flow.picks.anmeldungen.select} {...flow.pick('anmeldungen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Anmeldung mit offener Zahlung wählen\n2. Zahlungsstatus setzen\n3. Anmeldung bestätigen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `anmeldungen`:\n    - `zahlungsstatus`: the user enters it (bind it through the layer: form.field/…)\n    - `anmeldestatus`: fixed value `bestaetigt` — set it in the plan step's values, never ask\n\n## Reads\n- `anmeldungen` columns teilnehmer, kurs, anmeldedatum, anmeldestatus, zahlungsstatus\n\n## Success page\n- shows: `anmeldungen.zahlungsstatus`, `anmeldungen.anmeldestatus`\n\n## Never write these — another flow or a tool owns them\n- `teilnehmer.teilnehmer_firstname` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.teilnehmer_lastname` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.email` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.telefon` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.erfahrungslevel` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.gesundheitliche_hinweise` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.teilnehmer` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.kurs` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.anmeldedatum` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.bemerkung` (owner: intent `teilnehmer-anmelden`)\n- `kurse.kursname` (owner: intent `kurs-anlegen`)\n- `kurse.yogastil` (owner: intent `kurs-anlegen`)\n- `kurse.niveau` (owner: intent `kurs-anlegen`)\n- `kurse.kursleiter` (owner: intent `kurs-anlegen`)\n- `kurse.beschreibung` (owner: intent `kurs-anlegen`)\n- `kurse.startdatum` (owner: intent `kurs-anlegen`)\n- `kurse.dauer_minuten` (owner: intent `kurs-anlegen`)\n- `kurse.anzahl_termine` (owner: intent `kurs-anlegen`)\n- `kurse.wochentag` (owner: intent `kurs-anlegen`)\n- `kurse.raum` (owner: intent `kurs-anlegen`)\n- `kurse.max_teilnehmer` (owner: intent `kurs-anlegen`)\n- `kurse.preis` (owner: intent `kurs-anlegen`)\n- `kurse.status` (owner: intent `kurs-anlegen`)\n- `marketing.kurs` (owner: intent `kurs-anlegen`)\n- `marketing.insta_url` (owner: intent `kurs-anlegen`)\n- `marketing.tiktok_url` (owner: intent `kurs-anlegen`)\n"
+    },
+    {
+      "slug": "kurs-anlegen",
+      "label": {
+        "de": "Kurs anlegen und öffnen",
+        "en": "Create and open course"
+      },
+      "description": "Neuen Kurs mit Kursleiter, Termin und Preis anlegen und die Anmeldung öffnen, optional mit Marketing-Eintrag.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "kurse",
+          "op": "create",
+          "when": "always",
+          "fields": {
+            "kursname": "user",
+            "yogastil": "user",
+            "niveau": "user",
+            "kursleiter": "picked",
+            "beschreibung": "user",
+            "startdatum": "user",
+            "dauer_minuten": "user",
+            "anzahl_termine": "user",
+            "wochentag": "user",
+            "raum": "user",
+            "max_teilnehmer": "user",
+            "preis": "user",
+            "status": "fixed:anmeldung_offen"
+          },
+          "needs": {}
+        },
+        {
+          "entity": "marketing",
+          "op": "create",
+          "when": "optional",
+          "fields": {
+            "kurs": "picked",
+            "insta_url": "user",
+            "tiktok_url": "user"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [
+        "kurse.anzahl_termine",
+        "kurse.max_teilnehmer",
+        "kurse.startdatum"
+      ],
+      "brief": "# Flow `kurs-anlegen` — Kurs anlegen und öffnen\nNeuen Kurs mit Kursleiter, Termin und Preis anlegen und die Anmeldung öffnen, optional mit Marketing-Eintrag.\n\n## Your hook — import it, never rebuild what it owns\n`import { useKursAnlegenFlow } from '@/lib/journey/flows/KursAnlegen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`. Options: `steps` (field → step), `items` (how a hit reads, per pick: kursleiter, kurs), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Kursdaten und Kursleiter wählen\n2. Termin, Raum, Teilnehmerzahl und Preis festlegen\n3. Optional Instagram- und TikTok-Links hinterlegen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- creates `kurse`:\n    - `kursname`: the user enters it (bind it through the layer: form.field/…)\n    - `yogastil`: the user enters it (bind it through the layer: form.field/…)\n    - `niveau`: the user enters it (bind it through the layer: form.field/…)\n    - `kursleiter`: from the record the user picks in this flow\n    - `beschreibung`: the user enters it (bind it through the layer: form.field/…)\n    - `startdatum`: the user enters it (bind it through the layer: form.field/…) — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): tool `kurs-abschliessen` → `status` cannot be built without it\n    - `dauer_minuten`: the user enters it (bind it through the layer: form.field/…)\n    - `anzahl_termine`: the user enters it (bind it through the layer: form.field/…) — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): tool `kurs-abschliessen` → `status` cannot be built without it\n    - `wochentag`: the user enters it (bind it through the layer: form.field/…)\n    - `raum`: the user enters it (bind it through the layer: form.field/…)\n    - `max_teilnehmer`: the user enters it (bind it through the layer: form.field/…) — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): tool `kurs-ausgebucht-setzen` → `status`, tool `kurs-wieder-oeffnen` → `status` cannot be built without it\n    - `preis`: the user enters it (bind it through the layer: form.field/…)\n    - `status`: fixed value `anmeldung_offen` — set it in the plan step's values, never ask\n- creates `marketing` (only when the flow needs it):\n    - `kurs`: from the record the user picks in this flow\n    - `insta_url`: the user enters it (bind it through the layer: form.field/…)\n    - `tiktok_url`: the user enters it (bind it through the layer: form.field/…)\n\n## Reads\n- `yogalehrer` columns lehrer_firstname, lehrer_lastname, schwerpunkte\n\n## Success page\n- shows: `kurse.kursname`, `kurse.status`\n- next flows to offer: `teilnehmer-anmelden`\n\n## Never write these — another flow or a tool owns them\n- `teilnehmer.teilnehmer_firstname` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.teilnehmer_lastname` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.email` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.telefon` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.erfahrungslevel` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.gesundheitliche_hinweise` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.teilnehmer` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.kurs` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.anmeldedatum` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.anmeldestatus` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.zahlungsstatus` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.bemerkung` (owner: intent `teilnehmer-anmelden`)\n"
+    },
+    {
+      "slug": "anmeldung-stornieren",
+      "label": {
+        "de": "Anmeldung stornieren",
+        "en": "Cancel registration"
+      },
+      "description": "Eine Anmeldung stornieren und einen Wartelisten-Platz nachrücken lassen.",
+      "priority": "nice",
+      "writes": [
+        {
+          "entity": "anmeldungen",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "anmeldestatus": "fixed:storniert",
+            "bemerkung": "user"
+          },
+          "needs": {}
+        },
+        {
+          "entity": "anmeldungen",
+          "op": "update",
+          "when": "optional",
+          "fields": {
+            "anmeldestatus": "fixed:angemeldet"
+          },
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `anmeldung-stornieren` — Anmeldung stornieren\nEine Anmeldung stornieren und einen Wartelisten-Platz nachrücken lassen.\n\n## Your hook — import it, never rebuild what it owns\n`import { useAnmeldungStornierenFlow } from '@/lib/journey/flows/AnmeldungStornieren';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`. Options: `steps` (field → step), `items` (how a hit reads, per pick), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `anmeldungen`: `{...flow.picks.anmeldungen.select} {...flow.pick('anmeldungen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. This flow CHANGES a record of `anmeldungen`: `{...flow.picks.anmeldungen.select} {...flow.pick('anmeldungen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Anmeldung wählen\n2. Stornierung bestätigen\n3. Wartelisten-Eintrag des Kurses wählen und bestätigen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `anmeldungen`:\n    - `anmeldestatus`: fixed value `storniert` — set it in the plan step's values, never ask\n    - `bemerkung`: the user enters it (bind it through the layer: form.field/…)\n- updates `anmeldungen` (only when the flow needs it):\n    - `anmeldestatus`: fixed value `angemeldet` — set it in the plan step's values, never ask\n\n## Reads\n- `anmeldungen` columns teilnehmer, kurs, anmeldestatus, zahlungsstatus\n\n## Success page\n- shows: `anmeldungen.anmeldestatus`\n\n## Never write these — another flow or a tool owns them\n- `teilnehmer.teilnehmer_firstname` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.teilnehmer_lastname` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.email` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.telefon` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.erfahrungslevel` (owner: intent `teilnehmer-anmelden`)\n- `teilnehmer.gesundheitliche_hinweise` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.teilnehmer` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.kurs` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.anmeldedatum` (owner: intent `teilnehmer-anmelden`)\n- `anmeldungen.zahlungsstatus` (owner: intent `teilnehmer-anmelden`)\n- `kurse.kursname` (owner: intent `kurs-anlegen`)\n- `kurse.yogastil` (owner: intent `kurs-anlegen`)\n- `kurse.niveau` (owner: intent `kurs-anlegen`)\n- `kurse.kursleiter` (owner: intent `kurs-anlegen`)\n- `kurse.beschreibung` (owner: intent `kurs-anlegen`)\n- `kurse.startdatum` (owner: intent `kurs-anlegen`)\n- `kurse.dauer_minuten` (owner: intent `kurs-anlegen`)\n- `kurse.anzahl_termine` (owner: intent `kurs-anlegen`)\n- `kurse.wochentag` (owner: intent `kurs-anlegen`)\n- `kurse.raum` (owner: intent `kurs-anlegen`)\n- `kurse.max_teilnehmer` (owner: intent `kurs-anlegen`)\n- `kurse.preis` (owner: intent `kurs-anlegen`)\n- `kurse.status` (owner: intent `kurs-anlegen`)\n- `marketing.kurs` (owner: intent `kurs-anlegen`)\n- `marketing.insta_url` (owner: intent `kurs-anlegen`)\n- `marketing.tiktok_url` (owner: intent `kurs-anlegen`)\n"
+    }
+  ],
+  "public_pages": [],
+  "tools": [
+    {
+      "id": "kurs-ausgebucht-setzen",
+      "purpose": "Läuft bei jeder neuen Anmeldung: zählt die Anmeldungen des Kurses ohne Stornierungen und Warteliste und setzt den Kurs auf ausgebucht, sobald die maximale Teilnehmerzahl erreicht ist."
+    },
+    {
+      "id": "kurs-wieder-oeffnen",
+      "purpose": "Läuft bei jeder Änderung einer Anmeldung, prüft in seinem Code, ob nach einer Stornierung wieder Plätze frei sind, und öffnet dann einen ausgebuchten Kurs erneut für die Anmeldung."
+    },
+    {
+      "id": "kurs-laufend-setzen",
+      "purpose": "Setzt Kurse, deren Startdatum erreicht ist und die noch Anmeldung offen oder ausgebucht sind, auf laufend."
+    },
+    {
+      "id": "kurs-abschliessen",
+      "purpose": "Setzt laufende Kurse auf abgeschlossen, wenn der letzte Termin vorbei ist (Startdatum plus Anzahl der Termine in Wochen)."
+    }
+  ],
+  "covered_by_platform": [
+    {
+      "wish": "eine App für Marketing mit Kurs, Instagram-URL und TikTok-URL, jeweils mit Foto",
+      "feature": "record_form"
+    },
+    {
+      "wish": "Marketing-Einträge ansehen und nach Kurs durchsuchen",
+      "feature": "search_filter"
+    },
+    {
+      "wish": "Übersicht der Einträge pro Kurs",
+      "feature": "list_page"
+    },
+    {
+      "wish": "Fotos zu Instagram und TikTok speichern",
+      "feature": "record_attachments"
+    }
+  ],
+  "ownership": {
+    "teilnehmer": {
+      "teilnehmer_firstname": "intent:teilnehmer-anmelden",
+      "teilnehmer_lastname": "intent:teilnehmer-anmelden",
+      "email": "intent:teilnehmer-anmelden",
+      "telefon": "intent:teilnehmer-anmelden",
+      "erfahrungslevel": "intent:teilnehmer-anmelden",
+      "gesundheitliche_hinweise": "intent:teilnehmer-anmelden"
+    },
+    "anmeldungen": {
+      "teilnehmer": "intent:teilnehmer-anmelden",
+      "kurs": "intent:teilnehmer-anmelden",
+      "anmeldedatum": "intent:teilnehmer-anmelden",
+      "anmeldestatus": "intent:anmeldung-stornieren",
+      "zahlungsstatus": "intent:zahlung-erfassen",
+      "bemerkung": "intent:anmeldung-stornieren"
+    },
+    "kurse": {
+      "kursname": "intent:kurs-anlegen",
+      "yogastil": "intent:kurs-anlegen",
+      "niveau": "intent:kurs-anlegen",
+      "kursleiter": "intent:kurs-anlegen",
+      "beschreibung": "intent:kurs-anlegen",
+      "startdatum": "intent:kurs-anlegen",
+      "dauer_minuten": "intent:kurs-anlegen",
+      "anzahl_termine": "intent:kurs-anlegen",
+      "wochentag": "intent:kurs-anlegen",
+      "raum": "intent:kurs-anlegen",
+      "max_teilnehmer": "intent:kurs-anlegen",
+      "preis": "intent:kurs-anlegen",
+      "status": "tool:kurs-abschliessen"
+    },
+    "marketing": {
+      "kurs": "intent:kurs-anlegen",
+      "insta_url": "intent:kurs-anlegen",
+      "tiktok_url": "intent:kurs-anlegen"
+    }
+  },
+  "dashboard": {
+    "focus": [
+      "Kurse mit offener Anmeldung",
+      "Anmeldungen nach Status",
+      "Offene Zahlungen",
+      "Kommende Kurse"
+    ],
+    "hints": [
+      "Anmeldungen pro Kurs zeigen und mit der maximalen Teilnehmerzahl vergleichen",
+      "Wartelisten-Einträge sichtbar machen",
+      "Kurse ohne Marketing-Eintrag hervorheben"
+    ]
+  }
+}

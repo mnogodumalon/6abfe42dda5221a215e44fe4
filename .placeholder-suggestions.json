@@ -1,0 +1,43 @@
+{
+  "YogalehrerDialog.tsx": {
+    "lehrer_firstname": "z. B. Anna",
+    "lehrer_lastname": "z. B. Müller",
+    "email": "z. B. anna@yogastudio.de",
+    "kurzbeschreibung": "Erfahrung und Unterrichtsstil"
+  },
+  "TeilnehmerDialog.tsx": {
+    "teilnehmer_firstname": "z. B. Anna",
+    "teilnehmer_lastname": "z. B. Müller",
+    "email": "z. B. anna@beispiel.de",
+    "strasse": "z. B. Lindenallee",
+    "hausnummer": "z. B. 12a",
+    "plz": "z. B. 80331",
+    "ort": "z. B. München",
+    "gesundheitliche_hinweise": "Verletzungen, Beschwerden, Allergien"
+  },
+  "KurseDialog.tsx": {
+    "kursname": "z. B. Hatha am Morgen",
+    "yogastil": "z. B. Hatha, Vinyasa",
+    "kursleiter": "Wer leitet den Kurs?",
+    "beschreibung": "Worum geht es im Kurs?",
+    "startdatum": "Wann startet der Kurs?",
+    "dauer_minuten": "z. B. 60",
+    "anzahl_termine": "z. B. 10",
+    "wochentag": "z. B. Montag, Dienstag",
+    "raum": "z. B. Studio 1",
+    "max_teilnehmer": "z. B. 15",
+    "preis": "z. B. 120",
+    "status": "Wie ist der Stand?"
+  },
+  "AnmeldungenDialog.tsx": {
+    "teilnehmer": "Welcher Teilnehmer?",
+    "kurs": "Welcher Kurs?",
+    "anmeldedatum": "Wann war die Anmeldung?",
+    "bemerkung": "Besonderheiten, z. B. Allergien"
+  },
+  "MarketingDialog.tsx": {
+    "kurs": "Welcher Kurs?",
+    "insta_url": "z. B. instagram.com/yogastudio",
+    "tiktok_url": "z. B. tiktok.com/@yogastudio"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "pages": {
+    "en": {
+      "Alle Zahlungen sind eingegangen.": "All payments have been received.",
+      "Als Nächstes startet {0} ({1}).": "Next up: {0} ({1}).",
+      "Als ausgebucht markieren": "Mark as fully booked",
+      "Als bezahlt markieren": "Mark as paid",
+      "Anmeldung bestätigt": "Registration confirmed",
+      "Anmeldung geöffnet": "Registration opened",
+      "Anmeldung öffnen": "Open registration",
+      "Auf der Warteliste stehen {0} — ein Platz frei?": "{0} on the waitlist — a spot free?",
+      "Bei {0} ist die Zahlung noch offen.": "Payment from {0} is still outstanding.",
+      "Belegung offener Kurse": "Occupancy of open courses",
+      "Ersten Kurs anlegen": "Create first course",
+      "Jeder Kurs hat einen Marketing-Eintrag.": "Every course has a marketing entry.",
+      "Kurs voll": "Course full",
+      "Kurse ohne Marketing-Eintrag": "Courses without marketing entry",
+      "Neuer Kurs": "New course",
+      "Niemand wartet auf einen Platz.": "Nobody is waiting for a spot.",
+      "Noch kein Kurs geplant — lege den ersten Kurs an.": "No course scheduled yet — create the first course.",
+      "Offen": "Outstanding",
+      "Offene Zahlungen": "Outstanding payments",
+      "Offene Zahlungen · {0}": "Outstanding payments · {0}",
+      "Platz frei": "Spot available",
+      "Von Warteliste bestätigen": "Confirm from waitlist",
+      "Warteliste": "Waitlist",
+      "Zahlung verbucht": "Payment recorded",
+      "ist voll, die Anmeldung steht aber noch offen.": "is full, but registration is still open.",
+      "sind voll, die Anmeldung steht aber noch offen.": "are full, but registration is still open.",
+      "{0} angemeldet": "{0} registered",
+      "{0} auf Warteliste": "{0} on waitlist",
+      "{0} hat bezahlt": "{0} has paid",
+      "{0} ist ausgebucht": "{0} is fully booked",
+      "{0} ist bestätigt": "{0} is confirmed",
+      "✓ Bestätigen": "✓ Confirm",
+      "✓ Bezahlt": "✓ Paid"
+    }
+  },
+  "v": 1
+}
