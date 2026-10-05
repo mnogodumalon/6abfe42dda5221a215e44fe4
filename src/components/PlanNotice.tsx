@@ -6,8 +6,8 @@ import { getAppMap, openJobs, type AppMapState } from '@/lib/appMap';
 /**
  * PlanNotice — the way INTO „Deine Anwendung“ from the overview, one concrete
  * thing at a time and never a number. Precedence: a failed job („… hat nicht
- * geklappt. Ansehen ›“) > a running job („Die Anwendung baut gerade um …“) >
- * the first setup line that has a notice („Dein Logo fehlt noch … Einrichten ›“)
+ * geklappt. Ansehen ›“) > a running job („Die Anwendung baut gerade um …“) > a ready structure
+ * proposal („Neu in der Anwendung: … Ansehen ›“) > the first setup line that has a notice („Dein Logo fehlt noch … Einrichten ›“)
  * > nothing. Nothing when the application was never orchestrated.
  */
 const MAP_PATH = '#/verwaltung/anwendung';
@@ -19,11 +19,12 @@ function lineLink(id: string): string {
 export function PlanNotice() {
   const [st, setSt] = useState<AppMapState | null>(null);
   useEffect(() => { getAppMap().then(setSt).catch(() => setSt(null)); }, []);
-  if (!st?.map) return null;
+  if (!st?.map || !st.canChange) return null;   // the owner's to-do; a viewer without admin rights cannot act on it
   const jobs = openJobs(st.jobs);
   const failed = jobs.find(j => j.status === 'failed');
   const running = jobs.find(j => j.status === 'running');
   const setup = st.map.lines.find(l => l.group === 'setup' && !l.hidden && l.notice);
+  const structure = st.proposal?.status === 'ready' && st.proposal.kind === 'structure' ? st.proposal : null;
 
   let text: string;
   let action: string | null;
@@ -36,6 +37,10 @@ export function PlanNotice() {
     text = t('pn_running', { text: running.text });
     action = null;
     href = lineLink(running.line_id);
+  } else if (structure) {
+    text = t('pn_structure', { text: structure.wish });
+    action = t('pn_view');
+    href = MAP_PATH;
   } else if (setup?.notice) {
     text = setup.notice;
     action = t('pn_setup');

@@ -349,7 +349,7 @@ export function MarketingDialog({ open, onClose, onSubmit, defaultValues, record
         <Label htmlFor="kurs">{fieldLabel('marketing', 'kurs')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="kurs"
-          placeholder="Welcher Kurs?"
+          placeholder=""
           items={kurseListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kursname ?? r.record_id),
@@ -371,7 +371,7 @@ export function MarketingDialog({ open, onClose, onSubmit, defaultValues, record
           id="insta_url"
           type="url"
           inputMode="url"
-          placeholder="z. B. instagram.com/yogastudio"
+          placeholder=""
           value={fields.insta_url ?? ''}
           onChange={e => setFields(f => ({ ...f, insta_url: e.target.value }))}
         />
@@ -454,7 +454,7 @@ export function MarketingDialog({ open, onClose, onSubmit, defaultValues, record
           id="tiktok_url"
           type="url"
           inputMode="url"
-          placeholder="z. B. tiktok.com/@yogastudio"
+          placeholder=""
           value={fields.tiktok_url ?? ''}
           onChange={e => setFields(f => ({ ...f, tiktok_url: e.target.value }))}
         />

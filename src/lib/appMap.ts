@@ -42,7 +42,7 @@ export interface LineEditable {
   entity?: string;
 }
 
-export type GroupKind = 'setup' | 'create' | 'update' | 'schedule' | 'manual' | 'roles' | 'limits' | 'platform';
+export type GroupKind = 'setup' | 'gaps' | 'create' | 'update' | 'schedule' | 'manual' | 'roles' | 'limits' | 'platform';
 
 /** A block of the page, in display order. Empty groups are not sent. */
 export interface MapGroup {
@@ -123,7 +123,9 @@ export interface PlanChange {
   /** present when „Zurück auf vorher“ can re-apply it here — instant channels and „Passt“ only */
   undo?: { line_id: string; value?: unknown; unconfirm?: boolean } | null;
   /** present after agent work: „Zurückbauen · einige Minuten“ sends the old value as a new order */
-  rebuild?: { line_id: string; value?: unknown } | null;
+  rebuild?: { line_id: string; value?: unknown; job?: string } | null;
+  /** an agent change the server can restore exactly (a plain „Rückgängig“, no rebuild) */
+  exact?: boolean;
   undone?: boolean;
 }
 
@@ -145,6 +147,8 @@ export interface Proposal {
   /** the flow or automation the owner wrote the sentence about */
   about?: ChangeAbout | null;
   status: 'planning' | 'ready' | 'failed';
+  /** 'structure': proposed by the update flow for new lists/fields, not written by the owner */
+  kind?: string;
   created_at: string;
   summary?: string;
   items?: ProposalItem[];
@@ -173,9 +177,13 @@ export interface AppMapState {
   changes: PlanChange[];
   proposal: Proposal | null;
   jobs: Record<string, LineJob>;
+  /** a full build without this plan happened after it — the page says so */
+  stale: { at: string; reason: string } | null;
+  /** false for a viewer without admin rights: the page is read-only (an older server sends nothing = true) */
+  canChange: boolean;
 }
 
-const EMPTY: AppMapState = { map: null, status: null, createdAt: null, planVersion: 0, changes: [], proposal: null, jobs: {} };
+const EMPTY: AppMapState = { map: null, status: null, createdAt: null, planVersion: 0, changes: [], proposal: null, jobs: {}, stale: null, canChange: false };
 
 /** The newest job on a line, running first. */
 export function jobFor(jobs: Record<string, LineJob>, lineId: string): LineJob | undefined {
@@ -222,6 +230,8 @@ function stateOf(data: Record<string, unknown>): AppMapState {
     changes: (data.changes as PlanChange[] | undefined) ?? [],
     proposal: (data.proposal as Proposal | null | undefined) ?? null,
     jobs: (data.jobs as Record<string, LineJob> | undefined) ?? {},
+    stale: (data.stale as { at: string; reason: string } | null | undefined) ?? null,
+    canChange: data.can_change !== false,
   };
 }
 
@@ -267,10 +277,12 @@ export interface AnswerResult {
   changes?: PlanChange[];
 }
 
-/** The owner's sentence, bound to a flow or an automation when it has one; the proposal arrives on the next reads. */
-export async function proposeChange(text: string, about?: ChangeAbout | null): Promise<Proposal> {
+/** The owner's sentence, bound to a flow or an automation when it has one; the proposal arrives on the next reads.
+ *  `gap`: the id of a line under „Fehlt noch“ whose „Einrichten“ wrote the sentence — accepting the proposal removes the gap. */
+export async function proposeChange(text: string, about?: ChangeAbout | null, gap?: string | null): Promise<Proposal> {
   const res = await fetch(`${BASE}/${encodeURIComponent(APPGROUP_ID)}/changes`, {
-    method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(about ? { text, about } : { text }),
+    method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, ...(about ? { about } : {}), ...(gap ? { gap } : {}) }),
   });
   if (!res.ok) throw new Error(await readError(res));
   return (await res.json()).proposal as Proposal;

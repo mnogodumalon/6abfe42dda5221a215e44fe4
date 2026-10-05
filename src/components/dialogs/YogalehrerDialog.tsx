@@ -311,7 +311,7 @@ export function YogalehrerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="lehrer_firstname">{fieldLabel('yogalehrer', 'lehrer_firstname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="lehrer_firstname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.lehrer_firstname ?? ''}
           onChange={e => setFields(f => ({ ...f, lehrer_firstname: e.target.value }))}
           required
@@ -326,7 +326,7 @@ export function YogalehrerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="lehrer_lastname">{fieldLabel('yogalehrer', 'lehrer_lastname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="lehrer_lastname"
-          placeholder="z. B. Müller"
+          placeholder=""
           value={fields.lehrer_lastname ?? ''}
           onChange={e => setFields(f => ({ ...f, lehrer_lastname: e.target.value }))}
           required
@@ -343,7 +343,7 @@ export function YogalehrerDialog({ open, onClose, onSubmit, defaultValues, recor
           id="email"
           type="email"
           inputMode="email"
-          placeholder="z. B. anna@yogastudio.de"
+          placeholder=""
           value={fields.email ?? ''}
           onChange={e => setFields(f => ({ ...f, email: e.target.value }))}
         />
@@ -472,7 +472,7 @@ export function YogalehrerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="kurzbeschreibung">{fieldLabel('yogalehrer', 'kurzbeschreibung')}</Label>
         <Textarea
           id="kurzbeschreibung"
-          placeholder="Erfahrung und Unterrichtsstil"
+          placeholder=""
           value={fields.kurzbeschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, kurzbeschreibung: e.target.value }))}
           rows={3}

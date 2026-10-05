@@ -34,3 +34,22 @@ export const PLAN_SENTENCES: Record<string, string[]> = {
 };
 
 export const PLAN_SUMMARY = "Eine Verwaltung für Ihr Yogastudio: Sie pflegen Yogalehrer, Teilnehmer und Kurse, nehmen Anmeldungen entgegen und behalten Zahlungen im Blick. Für jeden Kurs lassen sich außerdem Marketing-Einträge mit Instagram- und TikTok-Link samt Foto ablegen.";
+
+/** slug → the lists a flow writes (the plan's Schreibliste). The nav leaves a
+ *  flow out for a user who may not write one of them (lib/permissions.ts). */
+export const FLOW_ENTITIES: Record<string, string[]> = {
+  "teilnehmer-anmelden": [
+    "anmeldungen",
+    "teilnehmer"
+  ],
+  "zahlung-erfassen": [
+    "anmeldungen"
+  ],
+  "kurs-anlegen": [
+    "kurse",
+    "marketing"
+  ],
+  "anmeldung-stornieren": [
+    "anmeldungen"
+  ]
+};

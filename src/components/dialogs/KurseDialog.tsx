@@ -360,7 +360,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
         <Label htmlFor="kursname">{fieldLabel('kurse', 'kursname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="kursname"
-          placeholder="z. B. Hatha am Morgen"
+          placeholder=""
           value={fields.kursname ?? ''}
           onChange={e => setFields(f => ({ ...f, kursname: e.target.value }))}
           required
@@ -377,7 +377,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           value={lookupKey(fields.yogastil) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, yogastil: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="yogastil" className="max-sm:h-11"><SelectValue placeholder="z. B. Hatha, Vinyasa" /></SelectTrigger>
+          <SelectTrigger id="yogastil" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="hatha">{lookupLabel('kurse', 'yogastil', 'hatha') ?? 'Hatha'}</SelectItem>
@@ -458,7 +458,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
         <Label htmlFor="kursleiter">{fieldLabel('kurse', 'kursleiter')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="kursleiter"
-          placeholder="Wer leitet den Kurs?"
+          placeholder=""
           items={yogalehrerListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.lehrer_firstname ?? r.record_id),
@@ -478,7 +478,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
         <Label htmlFor="beschreibung">{fieldLabel('kurse', 'beschreibung')}</Label>
         <Textarea
           id="beschreibung"
-          placeholder="Worum geht es im Kurs?"
+          placeholder=""
           value={fields.beschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, beschreibung: e.target.value }))}
           rows={3}
@@ -490,7 +490,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
         <Label htmlFor="startdatum">{fieldLabel('kurse', 'startdatum')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="startdatum"
-          placeholder="Wann startet der Kurs?"
+          placeholder=""
           mode="datetime"
           value={fields.startdatum ?? null}
           onChange={v => setFields(f => ({ ...f, startdatum: v ?? undefined }))}
@@ -510,7 +510,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'dauer_minuten')}
-          placeholder="z. B. 60"
+          placeholder=""
           value={fields.dauer_minuten !== undefined ? fields.dauer_minuten : (computedValues['dauer_minuten'] ?? '')}
           onChange={e => setFields(f => ({ ...f, dauer_minuten: clampNumberValue(formEnhancements, 'dauer_minuten', e.target.value) }))}
         />
@@ -525,7 +525,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'anzahl_termine')}
-          placeholder="z. B. 10"
+          placeholder=""
           value={fields.anzahl_termine !== undefined ? fields.anzahl_termine : (computedValues['anzahl_termine'] ?? '')}
           onChange={e => setFields(f => ({ ...f, anzahl_termine: clampNumberValue(formEnhancements, 'anzahl_termine', e.target.value) }))}
         />
@@ -538,7 +538,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           value={lookupKey(fields.wochentag) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, wochentag: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="wochentag" className="max-sm:h-11"><SelectValue placeholder="z. B. Montag, Dienstag" /></SelectTrigger>
+          <SelectTrigger id="wochentag" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="montag">{lookupLabel('kurse', 'wochentag', 'montag') ?? 'Montag'}</SelectItem>
@@ -557,7 +557,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
         <Label htmlFor="raum">{fieldLabel('kurse', 'raum')}</Label>
         <Input
           id="raum"
-          placeholder="z. B. Studio 1"
+          placeholder=""
           value={fields.raum ?? ''}
           onChange={e => setFields(f => ({ ...f, raum: e.target.value }))}
         />
@@ -572,7 +572,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'max_teilnehmer')}
-          placeholder="z. B. 15"
+          placeholder=""
           value={fields.max_teilnehmer !== undefined ? fields.max_teilnehmer : (computedValues['max_teilnehmer'] ?? '')}
           onChange={e => setFields(f => ({ ...f, max_teilnehmer: clampNumberValue(formEnhancements, 'max_teilnehmer', e.target.value) }))}
         />
@@ -587,7 +587,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'preis')}
-          placeholder="z. B. 120"
+          placeholder=""
           value={fields.preis !== undefined ? fields.preis : (computedValues['preis'] ?? '')}
           onChange={e => setFields(f => ({ ...f, preis: clampNumberValue(formEnhancements, 'preis', e.target.value) }))}
         />
@@ -600,7 +600,7 @@ export function KurseDialog({ open, onClose, onSubmit, defaultValues, recordId, 
           value={lookupKey(fields.status) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, status: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="Wie ist der Stand?" /></SelectTrigger>
+          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="geplant">{lookupLabel('kurse', 'status', 'geplant') ?? 'Geplant'}</SelectItem>

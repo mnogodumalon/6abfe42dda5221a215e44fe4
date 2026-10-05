@@ -6,6 +6,7 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { SatelliteSection } from '@/components/SatelliteSection';
+import { usePermissions } from '@/lib/permissions';
 
 export interface KurseDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -19,13 +20,13 @@ export interface KurseDetailsProps {
   /** Zeilen-Klick → overlay.push auf das Anmeldungen-Detail (nie der Edit-Dialog). */
   onOpenAnmeldungen: (record: Anmeldungen) => void;
   /** Kontextuelles „+": öffnet den Anmeldungen-Dialog mit diesem Record vorgesetzt. */
-  onAddAnmeldungen: () => void;
+  onAddAnmeldungen?: () => void;
   /** 1:N „Marketing" (kurs): VOLLE Liste — der Block filtert auf diesen Record. */
   marketingList: Marketing[];
   /** Zeilen-Klick → overlay.push auf das Marketing-Detail (nie der Edit-Dialog). */
   onOpenMarketing: (record: Marketing) => void;
   /** Kontextuelles „+": öffnet den Marketing-Dialog mit diesem Record vorgesetzt. */
-  onAddMarketing: () => void;
+  onAddMarketing?: () => void;
 }
 
 export function KurseDetails({
@@ -39,6 +40,8 @@ export function KurseDetails({
   onOpenMarketing,
   onAddMarketing,
 }: KurseDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   const kursleiterTarget = yogalehrerList.find(r => r.record_id === extractRecordId(record.fields.kursleiter));
   return (
     <>
@@ -85,7 +88,7 @@ export function KurseDetails({
         getKey={r => r.record_id}
       />
 
-      <RecordAttachments appId={APP_IDS.KURSE} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.KURSE} recordId={record.record_id} readOnly={!perms.canWrite('kurse')} />
     </>
   );
 }

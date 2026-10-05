@@ -1,8 +1,8 @@
 /**
  * useTeilnehmerAnmeldenFlow — the plumbing of the flow « Teilnehmer anmelden », generated from the plan.
  *
- * Writes `teilnehmer` (only when the person fills it): asks `teilnehmer_firstname`, `teilnehmer_lastname`, `email`, `telefon`, `erfahrungslevel`, `gesundheitliche_hinweise`.
-Writes `anmeldungen`: asks `teilnehmer`, `kurs`, `bemerkung`; sets `anmeldedatum`, `anmeldestatus`, `zahlungsstatus` itself; links `teilnehmer` ← the created `teilnehmer`.
+ * Writes `teilnehmer` (only when the person fills it): asks `email`, `telefon`, `erfahrungslevel`, `teilnehmer_lastname`, `teilnehmer_firstname`, `gesundheitliche_hinweise`.
+Writes `anmeldungen`: asks `kurs`, `bemerkung`, `teilnehmer`; sets `anmeldedatum`, `anmeldestatus`, `zahlungsstatus` itself; links `teilnehmer` ← the created `teilnehmer`.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
  * the plan), and the submit plan with its fixed and derived values. A page
@@ -17,17 +17,17 @@ Writes `anmeldungen`: asks `teilnehmer`, `kurs`, `bemerkung`; sets `anmeldedatum
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useTeilnehmerAnmeldenFlow({
- *     steps: { teilnehmer: 1, kurs: 2, teilnehmer_firstname: 3, teilnehmer_lastname: 3, email: 3, telefon: 3, erfahrungslevel: 3, gesundheitliche_hinweise: 3, bemerkung: 3 },
- *     items: { teilnehmer: r => ({ id: r.id, title: fieldText(r, 'teilnehmer_firstname') }) },
+ *     steps: { kurs: 1, teilnehmer: 2, email: 3, telefon: 3, erfahrungslevel: 3, teilnehmer_lastname: 3, teilnehmer_firstname: 3, gesundheitliche_hinweise: 3, bemerkung: 3 },
+ *     items: { kurs: r => ({ id: r.id, title: fieldText(r, 'kursname') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
- *     <EntitySelectStep {...flow.picks.teilnehmer.select} {...flow.pick('teilnehmer')} />
  *     <EntitySelectStep {...flow.picks.kurs.select} {...flow.pick('kurs')} />
- *     <Bound form={flow.forms.teilnehmer} name="teilnehmer_firstname" />
- *     <Bound form={flow.forms.teilnehmer} name="teilnehmer_lastname" />
+ *     <EntitySelectStep {...flow.picks.teilnehmer.select} {...flow.pick('teilnehmer')} />
  *     <Bound form={flow.forms.teilnehmer} name="email" />
  *     <Bound form={flow.forms.teilnehmer} name="telefon" />
  *     <Bound form={flow.forms.teilnehmer} name="erfahrungslevel" />
+ *     <Bound form={flow.forms.teilnehmer} name="teilnehmer_lastname" />
+ *     <Bound form={flow.forms.teilnehmer} name="teilnehmer_firstname" />
  *     <Bound form={flow.forms.teilnehmer} name="gesundheitliche_hinweise" />
  *     <Bound form={flow.forms.anmeldungen} name="bemerkung" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
@@ -60,12 +60,12 @@ export interface TeilnehmerAnmeldenFlowOptions {
   messages?: Partial<Record<Key, string>>;
   /** How a search hit reads — the card's title/subtitle/status per pick. */
   items?: {
-    teilnehmer?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     kurs?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
+    teilnehmer?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
   };
 }
 
-const DEFAULT_STEPS: Record<string, number> = {"bemerkung": 3, "email": 3, "erfahrungslevel": 3, "gesundheitliche_hinweise": 3, "kurs": 2, "teilnehmer": 1, "teilnehmer_firstname": 3, "teilnehmer_lastname": 3, "telefon": 3};
+const DEFAULT_STEPS: Record<string, number> = {"bemerkung": 3, "email": 3, "erfahrungslevel": 3, "gesundheitliche_hinweise": 3, "kurs": 1, "teilnehmer": 2, "teilnehmer_firstname": 3, "teilnehmer_lastname": 3, "telefon": 3};
 export const TEILNEHMERANMELDEN_REVIEW_STEP = 4;
 
 function fromPick<T>(pick: { recordOf(id: string): JourneyRecord | undefined }, form: StepForm, field: string, read: (r: JourneyRecord) => T): T | undefined {
@@ -97,16 +97,16 @@ function hasValues(form: StepForm): boolean {
 export function useTeilnehmerAnmeldenFlow(options: TeilnehmerAnmeldenFlowOptions = {}) {
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const teilnehmer = useStepForm('teilnehmer', {
-    fields: ["teilnehmer_firstname", "teilnehmer_lastname", "email", "telefon", "erfahrungslevel", "gesundheitliche_hinweise"],
-    steps: only(steps, ["teilnehmer_firstname", "teilnehmer_lastname", "email", "telefon", "erfahrungslevel", "gesundheitliche_hinweise"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["teilnehmer_firstname", "teilnehmer_lastname", "email", "telefon", "erfahrungslevel", "gesundheitliche_hinweise"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["teilnehmer_firstname", "teilnehmer_lastname", "email", "telefon", "erfahrungslevel", "gesundheitliche_hinweise"]),
+    fields: ["email", "telefon", "erfahrungslevel", "teilnehmer_lastname", "teilnehmer_firstname", "gesundheitliche_hinweise"],
+    steps: only(steps, ["email", "telefon", "erfahrungslevel", "teilnehmer_lastname", "teilnehmer_firstname", "gesundheitliche_hinweise"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["email", "telefon", "erfahrungslevel", "teilnehmer_lastname", "teilnehmer_firstname", "gesundheitliche_hinweise"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["email", "telefon", "erfahrungslevel", "teilnehmer_lastname", "teilnehmer_firstname", "gesundheitliche_hinweise"]),
   });
   const anmeldungen = useStepForm('anmeldungen', {
-    fields: ["teilnehmer", "kurs", "bemerkung"],
-    steps: only(steps, ["teilnehmer", "kurs", "bemerkung"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["teilnehmer", "kurs", "bemerkung"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["teilnehmer", "kurs", "bemerkung"]),
+    fields: ["kurs", "bemerkung", "teilnehmer"],
+    steps: only(steps, ["kurs", "bemerkung", "teilnehmer"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["kurs", "bemerkung", "teilnehmer"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["kurs", "bemerkung", "teilnehmer"]),
   });
   const forms: TeilnehmerAnmeldenForms = { teilnehmer, anmeldungen };
   const formList: StepForm[] = [teilnehmer, anmeldungen];
@@ -116,15 +116,15 @@ export function useTeilnehmerAnmeldenFlow(options: TeilnehmerAnmeldenFlowOptions
   // render time, so a change works on the running application.
   usePolicyVersion();
   const searches = {
-    teilnehmer: useRecordSearch(servicePort, 'teilnehmer', withPickPolicy('teilnehmer', {
-      searchFields: ["teilnehmer_firstname", "teilnehmer_lastname", "email"] as never,
-      toItem: options.items?.teilnehmer as never,
-    })),
     kurs: useRecordSearch(servicePort, 'kurse', withPickPolicy('kurs', {
       searchFields: ["kursname"] as never,
       filter: "r.v_status == 'anmeldung_offen'",
       where: (r: JourneyRecord) => (fieldLookup(r, "status")?.key ?? null) === "anmeldung_offen",
       toItem: options.items?.kurs as never,
+    })),
+    teilnehmer: useRecordSearch(servicePort, 'teilnehmer', withPickPolicy('teilnehmer', {
+      searchFields: ["teilnehmer_firstname", "teilnehmer_lastname", "email"] as never,
+      toItem: options.items?.teilnehmer as never,
     })),
   };
   // Whether a pick offers „Neu anlegen“ is the plan's call: off for the record
@@ -142,8 +142,8 @@ export function useTeilnehmerAnmeldenFlow(options: TeilnehmerAnmeldenFlowOptions
     href: `#/verwaltung/anwendung?line=intent:teilnehmer-anmelden:write:${entity}.${field}`,
   });
   const picks = {
-    teilnehmer: { ...searches.teilnehmer, select: { ...searches.teilnehmer.select, create: false as boolean, hint: hintFor('teilnehmer', 'teilnehmer', null as PickWhere | null) } },
     kurs: { ...searches.kurs, select: { ...searches.kurs.select, create: false as boolean, hint: hintFor('kurs', 'kurse', {"conditions": [{"field": "status", "op": "eq", "value": "anmeldung_offen"}], "mode": "all"} as PickWhere | null) } },
+    teilnehmer: { ...searches.teilnehmer, select: { ...searches.teilnehmer.select, create: false as boolean, hint: hintFor('teilnehmer', 'teilnehmer', null as PickWhere | null) } },
   };
 
   const teilnehmerFilled = hasValues(teilnehmer);
@@ -197,6 +197,11 @@ export function useTeilnehmerAnmeldenFlow(options: TeilnehmerAnmeldenFlowOptions
     form: anmeldungen,
     forms, formList, picks, submit, steps,    reviewStep: TEILNEHMERANMELDEN_REVIEW_STEP,
     pick, pickMany, validateStep, reset,
+    // the door the hook reads through — for what it does not own: availability
+    // (useOccupancy(flow.port, …)), a count (useRecordCount(flow.port, …)). A page
+    // importing servicePort next to the hook fails gate 3 (fewo 05.10.2026: the
+    // gate taught useOccupancy(servicePort, …) and forbade servicePort at once)
+    port: servicePort,
   };
 }
 

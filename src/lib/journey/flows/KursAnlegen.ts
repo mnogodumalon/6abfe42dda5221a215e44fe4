@@ -1,7 +1,7 @@
 /**
  * useKursAnlegenFlow — the plumbing of the flow « Kurs anlegen und öffnen », generated from the plan.
  *
- * Writes `kurse`: asks `kursname`, `yogastil`, `niveau`, `kursleiter`, `beschreibung`, `startdatum`, `dauer_minuten`, `anzahl_termine`, `wochentag`, `raum`, `max_teilnehmer`, `preis`; sets `status` itself.
+ * Writes `kurse`: asks `raum`, `preis`, `niveau`, `kursname`, `yogastil`, `wochentag`, `kursleiter`, `startdatum`, `beschreibung`, `dauer_minuten`, `anzahl_termine`, `max_teilnehmer`; sets `status` itself.
 Writes `marketing` (only when the person fills it): asks `insta_url`, `tiktok_url`; links `kurs` ← the created `kurse`.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
@@ -17,22 +17,22 @@ Writes `marketing` (only when the person fills it): asks `insta_url`, `tiktok_ur
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useKursAnlegenFlow({
- *     steps: { kursleiter: 1, kursname: 2, yogastil: 2, niveau: 2, beschreibung: 2, startdatum: 2, dauer_minuten: 2, anzahl_termine: 2, wochentag: 2, raum: 2, max_teilnehmer: 2, preis: 2, insta_url: 2, tiktok_url: 2 },
+ *     steps: { kursleiter: 1, raum: 2, preis: 2, niveau: 2, kursname: 2, yogastil: 2, wochentag: 2, startdatum: 2, beschreibung: 2, dauer_minuten: 2, anzahl_termine: 2, max_teilnehmer: 2, insta_url: 2, tiktok_url: 2 },
  *     items: { kursleiter: r => ({ id: r.id, title: fieldText(r, 'lehrer_firstname') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
  *     <EntitySelectStep {...flow.picks.kursleiter.select} {...flow.pick('kursleiter')} />
+ *     <Bound form={flow.forms.kurse} name="raum" />
+ *     <Bound form={flow.forms.kurse} name="preis" />
+ *     <Bound form={flow.forms.kurse} name="niveau" />
  *     <Bound form={flow.forms.kurse} name="kursname" />
  *     <Bound form={flow.forms.kurse} name="yogastil" />
- *     <Bound form={flow.forms.kurse} name="niveau" />
- *     <Bound form={flow.forms.kurse} name="beschreibung" />
+ *     <Bound form={flow.forms.kurse} name="wochentag" />
  *     <Bound form={flow.forms.kurse} name="startdatum" />
+ *     <Bound form={flow.forms.kurse} name="beschreibung" />
  *     <Bound form={flow.forms.kurse} name="dauer_minuten" />
  *     <Bound form={flow.forms.kurse} name="anzahl_termine" />
- *     <Bound form={flow.forms.kurse} name="wochentag" />
- *     <Bound form={flow.forms.kurse} name="raum" />
  *     <Bound form={flow.forms.kurse} name="max_teilnehmer" />
- *     <Bound form={flow.forms.kurse} name="preis" />
  *     <Bound form={flow.forms.marketing} name="insta_url" />
  *     <Bound form={flow.forms.marketing} name="tiktok_url" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
@@ -101,12 +101,12 @@ function hasValues(form: StepForm): boolean {
 export function useKursAnlegenFlow(options: KursAnlegenFlowOptions = {}) {
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const kurse = useStepForm('kurse', {
-    fields: ["kursname", "yogastil", "niveau", "kursleiter", "beschreibung", "startdatum", "dauer_minuten", "anzahl_termine", "wochentag", "raum", "max_teilnehmer", "preis"],
-    steps: only(steps, ["kursname", "yogastil", "niveau", "kursleiter", "beschreibung", "startdatum", "dauer_minuten", "anzahl_termine", "wochentag", "raum", "max_teilnehmer", "preis"]) as Record<string, number>,
+    fields: ["raum", "preis", "niveau", "kursname", "yogastil", "wochentag", "kursleiter", "startdatum", "beschreibung", "dauer_minuten", "anzahl_termine", "max_teilnehmer"],
+    steps: only(steps, ["raum", "preis", "niveau", "kursname", "yogastil", "wochentag", "kursleiter", "startdatum", "beschreibung", "dauer_minuten", "anzahl_termine", "max_teilnehmer"]) as Record<string, number>,
     // the plan builds a value from these — required here, whatever the app's base view says
     required: { anzahl_termine: true, max_teilnehmer: true, startdatum: true },
-    initial: only(options.initial as FormValues | undefined, ["kursname", "yogastil", "niveau", "kursleiter", "beschreibung", "startdatum", "dauer_minuten", "anzahl_termine", "wochentag", "raum", "max_teilnehmer", "preis"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["kursname", "yogastil", "niveau", "kursleiter", "beschreibung", "startdatum", "dauer_minuten", "anzahl_termine", "wochentag", "raum", "max_teilnehmer", "preis"]),
+    initial: only(options.initial as FormValues | undefined, ["raum", "preis", "niveau", "kursname", "yogastil", "wochentag", "kursleiter", "startdatum", "beschreibung", "dauer_minuten", "anzahl_termine", "max_teilnehmer"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["raum", "preis", "niveau", "kursname", "yogastil", "wochentag", "kursleiter", "startdatum", "beschreibung", "dauer_minuten", "anzahl_termine", "max_teilnehmer"]),
   });
   const marketing = useStepForm('marketing', {
     fields: ["insta_url", "tiktok_url"],
@@ -194,6 +194,11 @@ export function useKursAnlegenFlow(options: KursAnlegenFlowOptions = {}) {
     form: kurse,
     forms, formList, picks, submit, steps,    reviewStep: KURSANLEGEN_REVIEW_STEP,
     pick, pickMany, validateStep, reset,
+    // the door the hook reads through — for what it does not own: availability
+    // (useOccupancy(flow.port, …)), a count (useRecordCount(flow.port, …)). A page
+    // importing servicePort next to the hook fails gate 3 (fewo 05.10.2026: the
+    // gate taught useOccupancy(servicePort, …) and forbade servicePort at once)
+    port: servicePort,
   };
 }
 

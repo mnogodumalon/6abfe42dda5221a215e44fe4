@@ -311,7 +311,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="teilnehmer_firstname">{fieldLabel('teilnehmer', 'teilnehmer_firstname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="teilnehmer_firstname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.teilnehmer_firstname ?? ''}
           onChange={e => setFields(f => ({ ...f, teilnehmer_firstname: e.target.value }))}
           required
@@ -326,7 +326,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="teilnehmer_lastname">{fieldLabel('teilnehmer', 'teilnehmer_lastname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="teilnehmer_lastname"
-          placeholder="z. B. Müller"
+          placeholder=""
           value={fields.teilnehmer_lastname ?? ''}
           onChange={e => setFields(f => ({ ...f, teilnehmer_lastname: e.target.value }))}
           required
@@ -343,7 +343,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
           id="email"
           type="email"
           inputMode="email"
-          placeholder="z. B. anna@beispiel.de"
+          placeholder=""
           value={fields.email ?? ''}
           onChange={e => setFields(f => ({ ...f, email: e.target.value }))}
           required
@@ -371,7 +371,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="strasse">{fieldLabel('teilnehmer', 'strasse')}</Label>
         <Input
           id="strasse"
-          placeholder="z. B. Lindenallee"
+          placeholder=""
           value={fields.strasse ?? ''}
           onChange={e => setFields(f => ({ ...f, strasse: e.target.value }))}
         />
@@ -382,7 +382,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="hausnummer">{fieldLabel('teilnehmer', 'hausnummer')}</Label>
         <Input
           id="hausnummer"
-          placeholder="z. B. 12a"
+          placeholder=""
           value={fields.hausnummer ?? ''}
           onChange={e => setFields(f => ({ ...f, hausnummer: e.target.value }))}
         />
@@ -393,7 +393,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="plz">{fieldLabel('teilnehmer', 'plz')}</Label>
         <Input
           id="plz"
-          placeholder="z. B. 80331"
+          placeholder=""
           value={fields.plz ?? ''}
           onChange={e => setFields(f => ({ ...f, plz: e.target.value }))}
         />
@@ -404,7 +404,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="ort">{fieldLabel('teilnehmer', 'ort')}</Label>
         <Input
           id="ort"
-          placeholder="z. B. München"
+          placeholder=""
           value={fields.ort ?? ''}
           onChange={e => setFields(f => ({ ...f, ort: e.target.value }))}
         />
@@ -461,7 +461,7 @@ export function TeilnehmerDialog({ open, onClose, onSubmit, defaultValues, recor
         <Label htmlFor="gesundheitliche_hinweise">{fieldLabel('teilnehmer', 'gesundheitliche_hinweise')}</Label>
         <Textarea
           id="gesundheitliche_hinweise"
-          placeholder="Verletzungen, Beschwerden, Allergien"
+          placeholder=""
           value={fields.gesundheitliche_hinweise ?? ''}
           onChange={e => setFields(f => ({ ...f, gesundheitliche_hinweise: e.target.value }))}
           rows={3}

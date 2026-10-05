@@ -159,6 +159,8 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "download": "Herunterladen",
     "auth_error_title": "Du bist nicht angemeldet.",
     "auth_login_button": "Anmelden",
+    "perm_denied_title": "Dafür fehlt dir die Berechtigung.",
+    "perm_denied_desc": "Eine Administratorin oder ein Administrator der Anwendung kann sie dir geben.",
     "repair_text": "Dashboard reparieren",
     "repair_error_title": "Etwas ist schiefgelaufen",
     "repair_reload": "Neu laden",
@@ -493,9 +495,13 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "pn_failed": "{text} hat nicht geklappt.",
     "pn_view": "Ansehen",
     "pn_setup": "Einrichten",
+    "pn_structure": "{text} Soll die Anwendung dafür etwas tun?",
     "wz_adjust": "Anpassen",
     "am_nav": "Deine Anwendung",
     "am_none": "Für diese Anwendung gibt es hier noch nichts zu sehen.",
+    "am_stale": "Die Anwendung wurde am {date} neu gebaut, ohne diesen Plan zu kennen. Was hier steht, kann davon abweichen.",
+    "am_readonly": "Hier siehst du, wie die Anwendung arbeitet. Ändern können das nur Administratoren.",
+    "am_stale_rollback": "Die Anwendung wurde am {date} auf eine ältere Version zurückgesetzt. Was hier steht, kann die neuere beschreiben.",
     "am_loading": "Lade …",
     "am_saving": "Wird übernommen …",
     "am_upload": "Datei hochladen (PDF, DOCX)",
@@ -911,6 +917,8 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "download": "Download",
     "auth_error_title": "You are not logged in.",
     "auth_login_button": "Log in",
+    "perm_denied_title": "You do not have permission for this.",
+    "perm_denied_desc": "An administrator of the application can grant it.",
     "repair_text": "Repair Dashboard",
     "repair_error_title": "Something went wrong",
     "repair_reload": "Reload",
@@ -1245,9 +1253,13 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "pn_failed": "{text} did not work.",
     "pn_view": "View",
     "pn_setup": "Set up",
+    "pn_structure": "{text} Should the application do something for it?",
     "wz_adjust": "Adjust",
     "am_nav": "Your application",
     "am_none": "There is nothing to show for this application yet.",
+    "am_stale": "The application was rebuilt on {date} without this plan. What you read here may differ from it.",
+    "am_readonly": "This shows how the application works. Only administrators can change it.",
+    "am_stale_rollback": "The application was set back to an older version on {date}. What you read here may describe the newer one.",
     "am_loading": "Loading …",
     "am_saving": "Applying …",
     "am_upload": "Upload a file (PDF, DOCX)",
@@ -1768,7 +1780,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "erfahrungslevel": {
             "anfaenger": "Beginner",
             "fortgeschritten": "Advanced",
-            "profi": "Professional"
+            "profi": "Pro"
           }
         }
       },
@@ -1779,9 +1791,9 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "kursname": "Course Name",
           "yogastil": "Yoga Style",
           "niveau": "Level",
-          "kursleiter": "Instructor",
+          "kursleiter": "Course Instructor",
           "beschreibung": "Description",
-          "startdatum": "Start Date and Time",
+          "startdatum": "Start Date with Time",
           "dauer_minuten": "Duration per Session in Minutes",
           "anzahl_termine": "Number of Sessions",
           "wochentag": "Weekday",
@@ -1834,7 +1846,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "anmeldedatum": "Registration Date",
           "anmeldestatus": "Registration Status",
           "zahlungsstatus": "Payment Status",
-          "bemerkung": "Note"
+          "bemerkung": "Notes"
         },
         "lookups": {
           "anmeldestatus": {
@@ -1844,7 +1856,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "storniert": "Cancelled"
           },
           "zahlungsstatus": {
-            "offen": "Unpaid",
+            "offen": "Pending",
             "teilweise_bezahlt": "Partially Paid",
             "bezahlt": "Paid",
             "erstattet": "Refunded"

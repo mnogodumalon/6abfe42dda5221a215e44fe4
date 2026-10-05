@@ -5,6 +5,7 @@ import {
   RecordSection, RecordField, RecordRelation, RecordAttachments,
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
+import { usePermissions } from '@/lib/permissions';
 import { MediaThumbnail } from '@/components/widgets/MediaViewer';
 
 export interface MarketingDetailsProps {
@@ -21,6 +22,8 @@ export function MarketingDetails({
   kurseList,
   onOpenKurse,
 }: MarketingDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   const kursTarget = kurseList.find(r => r.record_id === extractRecordId(record.fields.kurs));
   return (
     <>
@@ -49,7 +52,7 @@ export function MarketingDetails({
         />
       </RecordSection>
 
-      <RecordAttachments appId={APP_IDS.MARKETING} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.MARKETING} recordId={record.record_id} readOnly={!perms.canWrite('marketing')} />
     </>
   );
 }

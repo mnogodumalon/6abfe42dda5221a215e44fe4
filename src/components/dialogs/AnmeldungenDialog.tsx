@@ -380,7 +380,7 @@ export function AnmeldungenDialog({ open, onClose, onSubmit, defaultValues, reco
         <Label htmlFor="teilnehmer">{fieldLabel('anmeldungen', 'teilnehmer')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="teilnehmer"
-          placeholder="Welcher Teilnehmer?"
+          placeholder=""
           items={teilnehmerListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.teilnehmer_firstname ?? r.record_id),
@@ -400,7 +400,7 @@ export function AnmeldungenDialog({ open, onClose, onSubmit, defaultValues, reco
         <Label htmlFor="kurs">{fieldLabel('anmeldungen', 'kurs')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="kurs"
-          placeholder="Welcher Kurs?"
+          placeholder=""
           items={kurseListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kursname ?? r.record_id),
@@ -420,7 +420,7 @@ export function AnmeldungenDialog({ open, onClose, onSubmit, defaultValues, reco
         <Label htmlFor="anmeldedatum">{fieldLabel('anmeldungen', 'anmeldedatum')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="anmeldedatum"
-          placeholder="Wann war die Anmeldung?"
+          placeholder=""
           mode="date"
           value={fields.anmeldedatum ?? null}
           onChange={v => setFields(f => ({ ...f, anmeldedatum: v ?? undefined }))}
@@ -554,7 +554,7 @@ export function AnmeldungenDialog({ open, onClose, onSubmit, defaultValues, reco
         <Label htmlFor="bemerkung">{fieldLabel('anmeldungen', 'bemerkung')}</Label>
         <Textarea
           id="bemerkung"
-          placeholder="Besonderheiten, z. B. Allergien"
+          placeholder=""
           value={fields.bemerkung ?? ''}
           onChange={e => setFields(f => ({ ...f, bemerkung: e.target.value }))}
           rows={3}

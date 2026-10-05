@@ -5,6 +5,7 @@ import {
   RecordSection, RecordField, RecordRelation, RecordAttachments,
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
+import { usePermissions } from '@/lib/permissions';
 
 export interface AnmeldungenDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -26,6 +27,8 @@ export function AnmeldungenDetails({
   kurseList,
   onOpenKurse,
 }: AnmeldungenDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   const teilnehmerTarget = teilnehmerList.find(r => r.record_id === extractRecordId(record.fields.teilnehmer));
   const kursTarget = kurseList.find(r => r.record_id === extractRecordId(record.fields.kurs));
   return (
@@ -53,7 +56,7 @@ export function AnmeldungenDetails({
         />
       </RecordSection>
 
-      <RecordAttachments appId={APP_IDS.ANMELDUNGEN} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.ANMELDUNGEN} recordId={record.record_id} readOnly={!perms.canWrite('anmeldungen')} />
     </>
   );
 }

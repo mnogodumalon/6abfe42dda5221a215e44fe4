@@ -43,10 +43,10 @@ export interface IntentLink {
 
 export const INTENTS: IntentLink[] = [
   // <custom:intents>
-  { path: '/intents/teilnehmer-anmelden', label: { de: 'Teilnehmer anmelden', en: 'Register participant' }, icon: IconUserPlus, description: 'Teilnehmer für einen Kurs anmelden' },
-  { path: '/intents/zahlung-erfassen', label: { de: 'Zahlung erfassen', en: 'Record payment' }, icon: IconCash, description: 'Zahlungsstatus einer Anmeldung setzen und bestätigen' },
-  { path: '/intents/kurs-anlegen', label: { de: 'Kurs anlegen und öffnen', en: 'Create and open course' }, icon: IconCalendarPlus, description: 'Neuen Kurs anlegen und Anmeldung öffnen, optional mit Marketing' },
-  { path: '/intents/anmeldung-stornieren', label: { de: 'Anmeldung stornieren', en: 'Cancel registration' }, icon: IconCircleX, description: 'Anmeldung stornieren und Wartelisten-Platz nachrücken lassen' },
+  { path: '/intents/teilnehmer-anmelden', label: { de: 'Teilnehmer anmelden', en: 'Register participant' }, icon: IconUserPlus, description: { de: 'Teilnehmer für einen Kurs anmelden', en: 'Register participant for a course' } },
+  { path: '/intents/zahlung-erfassen', label: { de: 'Zahlung erfassen', en: 'Record payment' }, icon: IconCash, description: { de: 'Zahlungsstatus einer Anmeldung setzen und bestätigen', en: 'Set payment status of a registration and confirm it' } },
+  { path: '/intents/kurs-anlegen', label: { de: 'Kurs anlegen und öffnen', en: 'Create and open course' }, icon: IconCalendarPlus, description: { de: 'Neuen Kurs anlegen und Anmeldung öffnen, optional mit Marketing', en: 'Create new course and open registration, optionally with marketing' } },
+  { path: '/intents/anmeldung-stornieren', label: { de: 'Anmeldung stornieren', en: 'Cancel registration' }, icon: IconCircleX, description: { de: 'Anmeldung stornieren und Wartelisten-Platz nachrücken lassen', en: 'Cancel registration and move up waitlist spot' } },
   // </custom:intents>
 ];
 
@@ -66,5 +66,5 @@ export const INTENTS_PENDING = false;
  * pulsing "werden erstellt …" in every deployed Phase-1 bundle forever — no
  * code path redeploys Phase 1 without the flag (live 03.09.2026).
  */
-export const INTENTS_PENDING_SINCE: string | null = '2026-10-02T17:05:45+00:00';
+export const INTENTS_PENDING_SINCE: string | null = null;
 export const PENDING_MAX_MINUTES = 30;

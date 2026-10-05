@@ -6,6 +6,7 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { SatelliteSection } from '@/components/SatelliteSection';
+import { usePermissions } from '@/lib/permissions';
 
 export interface YogalehrerDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -15,7 +16,7 @@ export interface YogalehrerDetailsProps {
   /** Zeilen-Klick → overlay.push auf das Kurse-Detail (nie der Edit-Dialog). */
   onOpenKurse: (record: Kurse) => void;
   /** Kontextuelles „+": öffnet den Kurse-Dialog mit diesem Record vorgesetzt. */
-  onAddKurse: () => void;
+  onAddKurse?: () => void;
 }
 
 export function YogalehrerDetails({
@@ -24,6 +25,8 @@ export function YogalehrerDetails({
   onOpenKurse,
   onAddKurse,
 }: YogalehrerDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -44,7 +47,7 @@ export function YogalehrerDetails({
         getKey={r => r.record_id}
       />
 
-      <RecordAttachments appId={APP_IDS.YOGALEHRER} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.YOGALEHRER} recordId={record.record_id} readOnly={!perms.canWrite('yogalehrer')} />
     </>
   );
 }

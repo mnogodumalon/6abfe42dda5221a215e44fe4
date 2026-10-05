@@ -236,6 +236,11 @@ export function useAnmeldungStornierenFlow(options: AnmeldungStornierenFlowOptio
     form: anmeldungen2,
     forms, formList, picks, submit, steps, targets,    reviewStep: ANMELDUNGSTORNIEREN_REVIEW_STEP,
     pick, pickMany, validateStep, reset,
+    // the door the hook reads through — for what it does not own: availability
+    // (useOccupancy(flow.port, …)), a count (useRecordCount(flow.port, …)). A page
+    // importing servicePort next to the hook fails gate 3 (fewo 05.10.2026: the
+    // gate taught useOccupancy(servicePort, …) and forbade servicePort at once)
+    port: servicePort,
   };
 }
 

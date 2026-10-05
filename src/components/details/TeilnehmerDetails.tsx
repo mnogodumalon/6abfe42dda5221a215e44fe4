@@ -6,6 +6,7 @@ import {
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
 import { SatelliteSection } from '@/components/SatelliteSection';
+import { usePermissions } from '@/lib/permissions';
 
 export interface TeilnehmerDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */
@@ -15,7 +16,7 @@ export interface TeilnehmerDetailsProps {
   /** Zeilen-Klick → overlay.push auf das Anmeldungen-Detail (nie der Edit-Dialog). */
   onOpenAnmeldungen: (record: Anmeldungen) => void;
   /** Kontextuelles „+": öffnet den Anmeldungen-Dialog mit diesem Record vorgesetzt. */
-  onAddAnmeldungen: () => void;
+  onAddAnmeldungen?: () => void;
 }
 
 export function TeilnehmerDetails({
@@ -24,6 +25,8 @@ export function TeilnehmerDetails({
   onOpenAnmeldungen,
   onAddAnmeldungen,
 }: TeilnehmerDetailsProps) {
+  // attachments are a write to this record — read-only without the platform right
+  const perms = usePermissions();
   return (
     <>
       <RecordSection title={t('details')} cols={2}>
@@ -48,7 +51,7 @@ export function TeilnehmerDetails({
         getKey={r => r.record_id}
       />
 
-      <RecordAttachments appId={APP_IDS.TEILNEHMER} recordId={record.record_id} />
+      <RecordAttachments appId={APP_IDS.TEILNEHMER} recordId={record.record_id} readOnly={!perms.canWrite('teilnehmer')} />
     </>
   );
 }

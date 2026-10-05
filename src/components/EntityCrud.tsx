@@ -71,6 +71,8 @@ import { MarketingDetails } from '@/components/details/MarketingDetails';
 import { AI_PHOTO_SCAN, AI_PHOTO_LOCATION } from '@/config/ai-features';
 import { t, appLabel } from '@/i18n';
 import { undoToast } from '@/lib/polish';
+import { usePermissions } from '@/lib/permissions';
+import { toast } from 'sonner';
 import { formatDate } from '@/lib/formatters';
 
 // The overlay union — one branch per entity, `record` typed the way the data
@@ -100,6 +102,10 @@ export interface EntityCrudApi<TRecord, TDefaults> {
   openEdit: (record: TRecord) => void;
   /** Open the record overlay (raw record is fine — enrichment resolved inside). */
   openDetail: (record: TRecord) => void;
+  /** May the signed-in user create/change records of this list? (the
+   *  platform's rights — show a „+ Neu“ only when true; openCreate/openEdit
+   *  refuse with a notice otherwise). */
+  canWrite: boolean;
 }
 
 export interface EntityCrud {
@@ -120,6 +126,9 @@ export interface EntityCrud {
 
 export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions): EntityCrud {
   const overlay = useRecordOverlayStack<OverlayItem>();
+  // the platform's rights of the signed-in user (lib/permissions.ts) — unknown = allowed
+  const perms = usePermissions();
+  const refuse = () => { toast.error(t('perm_denied_title'), { description: t('perm_denied_desc') }); };
   const [yogalehrerDialog, setYogalehrerDialog] = useState<{ defaults?: YogalehrerDialogDefaults; editing?: Yogalehrer } | null>(null);
   const [teilnehmerDialog, setTeilnehmerDialog] = useState<{ defaults?: TeilnehmerDialogDefaults; editing?: Teilnehmer } | null>(null);
   const [kurseDialog, setKurseDialog] = useState<{ defaults?: KurseDialogDefaults; editing?: Kurse } | null>(null);
@@ -335,7 +344,7 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                   record={top.record}
                   kurseList={data.kurse}
                   onOpenKurse={(r) => detailKurse(r, true)}
-                  onAddKurse={() => setKurseDialog({ defaults: { kursleiter: createRecordUrl(APP_IDS.YOGALEHRER, top.record.record_id) } })}
+                  onAddKurse={perms.canWrite('kurse') ? () => setKurseDialog({ defaults: { kursleiter: createRecordUrl(APP_IDS.YOGALEHRER, top.record.record_id) } }) : undefined}
                 />
               </>
             );
@@ -348,7 +357,7 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                   record={top.record}
                   anmeldungenList={data.anmeldungen}
                   onOpenAnmeldungen={(r) => detailAnmeldungen(r, true)}
-                  onAddAnmeldungen={() => setAnmeldungenDialog({ defaults: { teilnehmer: createRecordUrl(APP_IDS.TEILNEHMER, top.record.record_id) } })}
+                  onAddAnmeldungen={perms.canWrite('anmeldungen') ? () => setAnmeldungenDialog({ defaults: { teilnehmer: createRecordUrl(APP_IDS.TEILNEHMER, top.record.record_id) } }) : undefined}
                 />
               </>
             );
@@ -363,10 +372,10 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
                   onOpenYogalehrer={(r) => detailYogalehrer(r, true)}
                   anmeldungenList={data.anmeldungen}
                   onOpenAnmeldungen={(r) => detailAnmeldungen(r, true)}
-                  onAddAnmeldungen={() => setAnmeldungenDialog({ defaults: { kurs: createRecordUrl(APP_IDS.KURSE, top.record.record_id) } })}
+                  onAddAnmeldungen={perms.canWrite('anmeldungen') ? () => setAnmeldungenDialog({ defaults: { kurs: createRecordUrl(APP_IDS.KURSE, top.record.record_id) } }) : undefined}
                   marketingList={data.marketing}
                   onOpenMarketing={(r) => detailMarketing(r, true)}
-                  onAddMarketing={() => setMarketingDialog({ defaults: { kurs: createRecordUrl(APP_IDS.KURSE, top.record.record_id) } })}
+                  onAddMarketing={perms.canWrite('marketing') ? () => setMarketingDialog({ defaults: { kurs: createRecordUrl(APP_IDS.KURSE, top.record.record_id) } }) : undefined}
                 />
               </>
             );
@@ -399,6 +408,14 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
           }
           return null;
         }}
+        canEdit={(top) => {
+          if (top.type === 'yogalehrer') return perms.canWrite('yogalehrer');
+          if (top.type === 'teilnehmer') return perms.canWrite('teilnehmer');
+          if (top.type === 'kurse') return perms.canWrite('kurse');
+          if (top.type === 'anmeldungen') return perms.canWrite('anmeldungen');
+          if (top.type === 'marketing') return perms.canWrite('marketing');
+          return true;
+        }}
         onEdit={(top) => {
           overlay.close();
           if (top.type === 'yogalehrer') setYogalehrerDialog({ editing: top.record, defaults: top.record.fields });
@@ -415,29 +432,34 @@ export function useEntityCrud(data: EntityCrudData, options?: EntityCrudOptions)
     overlay,
     surfaces,
     yogalehrer: {
-      openCreate: (defaults?: YogalehrerDialogDefaults) => setYogalehrerDialog({ defaults }),
-      openEdit: (record: Yogalehrer) => setYogalehrerDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: YogalehrerDialogDefaults) => (perms.canWrite('yogalehrer') ? setYogalehrerDialog({ defaults }) : refuse()),
+      openEdit: (record: Yogalehrer) => (perms.canWrite('yogalehrer') ? setYogalehrerDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Yogalehrer) => detailYogalehrer(record, false),
+      canWrite: perms.canWrite('yogalehrer'),
     },
     teilnehmer: {
-      openCreate: (defaults?: TeilnehmerDialogDefaults) => setTeilnehmerDialog({ defaults }),
-      openEdit: (record: Teilnehmer) => setTeilnehmerDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: TeilnehmerDialogDefaults) => (perms.canWrite('teilnehmer') ? setTeilnehmerDialog({ defaults }) : refuse()),
+      openEdit: (record: Teilnehmer) => (perms.canWrite('teilnehmer') ? setTeilnehmerDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Teilnehmer) => detailTeilnehmer(record, false),
+      canWrite: perms.canWrite('teilnehmer'),
     },
     kurse: {
-      openCreate: (defaults?: KurseDialogDefaults) => setKurseDialog({ defaults }),
-      openEdit: (record: Kurse) => setKurseDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: KurseDialogDefaults) => (perms.canWrite('kurse') ? setKurseDialog({ defaults }) : refuse()),
+      openEdit: (record: Kurse) => (perms.canWrite('kurse') ? setKurseDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Kurse) => detailKurse(record, false),
+      canWrite: perms.canWrite('kurse'),
     },
     anmeldungen: {
-      openCreate: (defaults?: AnmeldungenDialogDefaults) => setAnmeldungenDialog({ defaults }),
-      openEdit: (record: Anmeldungen) => setAnmeldungenDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: AnmeldungenDialogDefaults) => (perms.canWrite('anmeldungen') ? setAnmeldungenDialog({ defaults }) : refuse()),
+      openEdit: (record: Anmeldungen) => (perms.canWrite('anmeldungen') ? setAnmeldungenDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Anmeldungen) => detailAnmeldungen(record, false),
+      canWrite: perms.canWrite('anmeldungen'),
     },
     marketing: {
-      openCreate: (defaults?: MarketingDialogDefaults) => setMarketingDialog({ defaults }),
-      openEdit: (record: Marketing) => setMarketingDialog({ editing: record, defaults: record.fields }),
+      openCreate: (defaults?: MarketingDialogDefaults) => (perms.canWrite('marketing') ? setMarketingDialog({ defaults }) : refuse()),
+      openEdit: (record: Marketing) => (perms.canWrite('marketing') ? setMarketingDialog({ editing: record, defaults: record.fields }) : refuse()),
       openDetail: (record: Marketing) => detailMarketing(record, false),
+      canWrite: perms.canWrite('marketing'),
     },
     enriched: { yogalehrer: data.yogalehrer, teilnehmer: data.teilnehmer, kurse: enrichedKurse, anmeldungen: enrichedAnmeldungen, marketing: enrichedMarketing },
   };
